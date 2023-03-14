@@ -1,4 +1,4 @@
-name: flake8 & Pytest
+name: flake8
 
 on:
   push:
