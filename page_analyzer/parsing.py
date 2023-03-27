@@ -11,9 +11,8 @@ def get_seo_data(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
-        if response:
-            dict_tags['status_code'] = response.status_code
-            return find_tag(response, tags, dict_tags)
+        dict_tags['status_code'] = response.status_code
+        return find_tag(response, tags, dict_tags)
     except Exception as e:
         print(e)
         return False
