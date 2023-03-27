@@ -13,7 +13,6 @@ from validators import url as validator, length
 from datetime import datetime
 from dotenv import load_dotenv
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -37,6 +36,7 @@ def execute_sql(sql, *args, fetch=True, fetch_all=True):
                     return cur
     except errors as error:
         print(error)
+        return False
 
 
 def check_repeat_url(url):
@@ -119,12 +119,24 @@ def show_url(id_url):
 def check_url(id_url):
     sql = 'SELECT name FROM urls WHERE id = %s;'
     url = execute_sql(sql, id_url, fetch_all=False)
-    status_code = get_seo_data(url)
-    if status_code == 200:
+    seo_data = get_seo_data(url[0])
+    if seo_data['status_code'] == 200:
         sql = '''INSERT INTO
-            url_checks (url_id, created_at, status_code)
-            VALUES (%s, %s, %s)'''
-        execute_sql(sql, id_url, datetime.now(), status_code, fetch=False)
+            url_checks (url_id,
+                        created_at,
+                        status_code,
+                        description,
+                        h1,
+                        title)
+            VALUES (%s, %s, %s, %s, %s, %s)'''
+        execute_sql(sql,
+                    id_url,
+                    datetime.now(),
+                    seo_data['status_code'],
+                    seo_data['description'],
+                    seo_data['h1'],
+                    seo_data['title'],
+                    fetch=False)
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')
