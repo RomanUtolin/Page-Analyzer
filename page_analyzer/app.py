@@ -120,7 +120,7 @@ def check_url(id_url):
     sql = 'SELECT name FROM urls WHERE id = %s;'
     url = execute_sql(sql, id_url, fetch_all=False)
     seo_data = get_seo_data(url[0])
-    if seo_data['status_code'] == 200:
+    if seo_data:
         sql = '''INSERT INTO
             url_checks (url_id,
                         created_at,

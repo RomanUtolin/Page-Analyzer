@@ -9,13 +9,13 @@ def get_seo_data(url):
                  'title': None,
                  'status_code': None}
     try:
-        get_html = requests.get(url)
-        status_code = get_html.status_code
-        dict_tags['status_code'] = status_code
-        return find_tag(get_html, tags, dict_tags)
+        response = requests.get(url)
+        if response:
+            dict_tags['status_code'] = response.status_code
+            return find_tag(response, tags, dict_tags)
     except Exception as e:
         print(e)
-        return dict_tags
+        return False
 
 
 def find_tag(html, tags, dict_tags):
