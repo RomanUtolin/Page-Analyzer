@@ -92,8 +92,7 @@ def add_urls():
         elif len(url) > 255:
             flash('URL превышает 255 символов', 'danger')
         flash('Некорректный URL', 'danger')
-    return render_template('index.html',
-                           url=url_for('index')), 422
+    return render_template('index.html'), 422
 
 
 @app.get('/urls/<id_url>')
