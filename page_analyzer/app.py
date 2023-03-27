@@ -1,14 +1,18 @@
 import os
-import psycopg2
-import psycopg2.extras
-import psycopg2.errors
-from flask import Flask, render_template, redirect, url_for, request, flash, abort
+from page_analyzer.parsing import get_status_code
+from flask import (Flask,
+                   render_template,
+                   redirect,
+                   url_for,
+                   request,
+                   flash,
+                   abort)
+from psycopg2 import connect, extras, errors
 from urllib.parse import urlparse
-from validators import url as validator
-from validators import length
+from validators import url as validator, length
 from datetime import datetime
 from dotenv import load_dotenv
-from page_analyzer.parsing import get_status_code
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -21,8 +25,8 @@ app.secret_key = SECRET_KEY
 
 def execute_sql(sql, *args, fetch=True, fetch_all=True):
     try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as curs:
+        with connect(DATABASE_URL) as conn:
+            with conn.cursor(cursor_factory=extras.DictCursor) as curs:
                 curs.execute(sql, args)
                 conn.commit()
                 if fetch is True:
@@ -31,7 +35,7 @@ def execute_sql(sql, *args, fetch=True, fetch_all=True):
                     else:
                         cur = curs.fetchone()
                     return cur
-    except psycopg2.errors as error:
+    except errors as error:
         print(error)
 
 
@@ -94,7 +98,7 @@ def add_urls():
 @app.get('/urls/<id_url>')
 def show_url(id_url):
     sql = 'SELECT id, name, created_at FROM urls WHERE id=%s'
-    url_name_from_bd = execute_sql(sql, id_url, fetch_all=False)
+    url_name = execute_sql(sql, id_url, fetch_all=False)
     sql = '''SELECT
             url_checks.id as check_id,
             status_code,
@@ -105,10 +109,10 @@ def show_url(id_url):
             FROM urls JOIN url_checks ON urls.id = url_checks.url_id
             WHERE url_id = %s
             ORDER BY check_id DESC;'''
-    url_check_from_bd = execute_sql(sql, id_url)
-    if not url_name_from_bd:
+    url_check = execute_sql(sql, id_url)
+    if not url_name:
         abort(404)
-    return render_template('url_id.html', url=url_name_from_bd, url_check=url_check_from_bd)
+    return render_template('url_id.html', url=url_name, url_check=url_check)
 
 
 @app.post('/urls/<id_url>/checks')
@@ -116,7 +120,8 @@ def check_url(id_url):
     sql = 'SELECT name FROM urls WHERE id = %s;'
     url = execute_sql(sql, id_url, fetch_all=False)
     status_code = get_status_code(url)
-    sql = 'INSERT INTO url_checks (url_id, created_at, status_code) VALUES (%s, %s, %s)'
+    sql = '''INSERT INTO url_checks (url_id, created_at, status_code)
+            VALUES (%s, %s, %s)'''
     execute_sql(sql, id_url, datetime.now(), status_code, fetch=False)
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_url', id_url=id_url))
