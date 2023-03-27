@@ -1,5 +1,5 @@
 import os
-from page_analyzer.parsing import get_status_code
+from page_analyzer.parsing import get_seo_data
 from flask import (Flask,
                    render_template,
                    redirect,
@@ -119,9 +119,13 @@ def show_url(id_url):
 def check_url(id_url):
     sql = 'SELECT name FROM urls WHERE id = %s;'
     url = execute_sql(sql, id_url, fetch_all=False)
-    status_code = get_status_code(url)
-    sql = '''INSERT INTO url_checks (url_id, created_at, status_code)
+    status_code = get_seo_data(url)
+    if status_code == 200:
+        sql = '''INSERT INTO
+            url_checks (url_id, created_at, status_code)
             VALUES (%s, %s, %s)'''
-    execute_sql(sql, id_url, datetime.now(), status_code, fetch=False)
-    flash('Страница успешно проверена', 'success')
+        execute_sql(sql, id_url, datetime.now(), status_code, fetch=False)
+        flash('Страница успешно проверена', 'success')
+    else:
+        flash('Произошла ошибка при проверке', 'danger')
     return redirect(url_for('show_url', id_url=id_url))
