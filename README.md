@@ -18,8 +18,6 @@ add '.env' in the root directory of your project
 ````
 ````
 make install
-make buid
-make package-install
 ````
 ````
 make start (to start Development Server)
