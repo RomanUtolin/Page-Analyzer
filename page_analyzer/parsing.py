@@ -18,12 +18,13 @@ def get_seo_data(url):
         return False
 
 
-def find_tag(html, tags, dict_tags):
-    soup = BeautifulSoup(html.text, 'html.parser')
+def find_tag(response, tags, dict_tags):
+    soup = BeautifulSoup(response.text, 'html.parser')
     for t in tags:
-        if t == 'meta' and soup.find("meta", attrs={"name": "description"}):
-            dict_tags['description'] = \
-                soup.find("meta", attrs={"name": "description"}).get("content")
+        if t == 'meta':
+            find = soup.find('meta', attrs={"name": "description"})
+            if find:
+                dict_tags['description'] = find.get("content")
         else:
             if soup.find(t):
                 dict_tags[t] = soup.find(t).getText()
