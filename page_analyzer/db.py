@@ -93,22 +93,30 @@ def check_url(id_url):
 
 def add_urls(url):
     conn = connect_db()
-    flash_msg = []
     sql_for_get_id = 'SELECT id FROM urls WHERE name=%s'
     sql_for_add = 'INSERT INTO urls (name, created_at) VALUES (%s, %s)'
     try:
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
+            curs.execute(sql_for_add, (url, datetime.now(),))
+            conn.commit()
             curs.execute(sql_for_get_id, (url,))
             url_from_bd = curs.fetchone()
-            if not url_from_bd:
-                curs.execute(sql_for_add, (url, datetime.now(),))
-                conn.commit()
-                curs.execute(sql_for_get_id, (url,))
-                url_from_bd = curs.fetchone()
-                flash_msg.append(('Страница успешно добавлена', 'success'))
-            else:
-                flash_msg.append(('Страница уже существует', 'info'))
-            return url_from_bd['id'], flash_msg
+            return url_from_bd['id']
+
+    except errors as error:
+        print(error)
+        return False
+
+
+def repeat(url):
+    conn = connect_db()
+    sql = 'SELECT name FROM urls WHERE name=%s'
+    try:
+        with conn.cursor(cursor_factory=extras.DictCursor) as curs:
+            curs.execute(sql, (url,))
+            url_from_bd = curs.fetchone()
+            if url_from_bd:
+                return True
 
     except errors as error:
         print(error)
