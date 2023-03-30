@@ -110,13 +110,13 @@ def add_urls(url):
 
 def repeat(url):
     conn = connect_db()
-    sql = 'SELECT name FROM urls WHERE name=%s'
+    sql = 'SELECT id FROM urls WHERE name=%s'
     try:
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
             curs.execute(sql, (url,))
             url_from_bd = curs.fetchone()
             if url_from_bd:
-                return True
+                return url_from_bd['id']
 
     except errors as error:
         print(error)

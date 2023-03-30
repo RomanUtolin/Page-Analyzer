@@ -39,13 +39,13 @@ def add_urls():
     errors = urls.validate_url(url)
     if not errors:
         url = urls.normalized_url(url)
-        check_repeat = db.repeat(url)
-        if not check_repeat:
+        id_url = db.repeat(url)
+        if id_url:
+            flash('Страница уже существует', 'info')
+        else:
             id_url = db.add_urls(url)
             flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('show_url', id_url=id_url))
-        else:
-            flash('Страница уже существует', 'info')
+        return redirect(url_for('show_url', id_url=id_url))
     for msg, cat in errors:
         flash(msg, cat)
     return render_template('index.html'), 422
