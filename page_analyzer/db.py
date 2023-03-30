@@ -1,22 +1,9 @@
-import os
 from page_analyzer.parsing import get_seo_data
-from psycopg2 import connect, extras, errors
+from psycopg2 import extras, errors
 from datetime import datetime
 
-DATABASE_URL = os.getenv('DATABASE_URL')
 
-
-def connect_db():
-    try:
-        with connect(DATABASE_URL) as conn:
-            return conn
-    except errors as error:
-        print(error)
-        return False
-
-
-def get_urls():
-    conn = connect_db()
+def get_urls(conn):
     sql = '''SELECT DISTINCT ON (urls.id)
                 urls.id,
                 name,
@@ -35,8 +22,7 @@ def get_urls():
         return False
 
 
-def show_url(id_url):
-    conn = connect_db()
+def show_url(id_url, conn):
     sql_for_url_name = 'SELECT id, name, created_at FROM urls WHERE id=%s'
     sql_for_check_info = '''SELECT
                         url_checks.id as check_id,
@@ -61,8 +47,7 @@ def show_url(id_url):
         return False
 
 
-def check_url(id_url):
-    conn = connect_db()
+def check_url(id_url, conn):
     sql = 'SELECT name FROM urls WHERE id = %s;'
     try:
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
@@ -92,8 +77,7 @@ def check_url(id_url):
         return False
 
 
-def add_urls(url):
-    conn = connect_db()
+def add_urls(url, conn):
     sql_for_get_id = 'SELECT id FROM urls WHERE name=%s'
     sql_for_add = 'INSERT INTO urls (name, created_at) VALUES (%s, %s)'
     try:
@@ -109,8 +93,7 @@ def add_urls(url):
         return False
 
 
-def repeat(url):
-    conn = connect_db()
+def repeat(url, conn):
     sql = 'SELECT id FROM urls WHERE name=%s'
     try:
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
