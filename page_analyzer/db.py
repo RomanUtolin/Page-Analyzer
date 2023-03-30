@@ -45,7 +45,8 @@ def show_url(id_url):
                         title,
                         description,
                         url_checks.created_at as site_check
-                        FROM urls JOIN url_checks ON urls.id = url_checks.url_id
+                        FROM urls
+                        JOIN url_checks ON urls.id = url_checks.url_id
                         WHERE url_id = %s
                         ORDER BY check_id DESC;'''
     try:
@@ -92,7 +93,7 @@ def check_url(id_url):
 
 def add_urls(url):
     conn = connect_db()
-    flash_msg_list = []
+    flash_msg = []
     sql_for_get_id = 'SELECT id FROM urls WHERE name=%s'
     sql_for_add = 'INSERT INTO urls (name, created_at) VALUES (%s, %s)'
     try:
@@ -103,12 +104,11 @@ def add_urls(url):
                 curs.execute(sql_for_add, (url, datetime.now(),))
                 conn.commit()
                 curs.execute(sql_for_get_id, (url,))
-                url_id = curs.fetchone()
-                url_from_bd = url_id
-                flash_msg_list.append(('Страница успешно добавлена', 'success'))
+                url_from_bd = curs.fetchone()
+                flash_msg.append(('Страница успешно добавлена', 'success'))
             else:
-                flash_msg_list.append(('Страница уже существует', 'info'))
-            return url_from_bd['id'], flash_msg_list
+                flash_msg.append(('Страница уже существует', 'info'))
+            return url_from_bd['id'], flash_msg
 
     except errors as error:
         print(error)
