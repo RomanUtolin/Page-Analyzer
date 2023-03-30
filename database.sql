@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS urls (
     created_at timestamp NOT NULL
 );
 
+
 CREATE TABLE IF NOT EXISTS url_checks (
 id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 url_id bigint REFERENCES urls (id),

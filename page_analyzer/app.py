@@ -59,6 +59,8 @@ def show_url(id_url):
 
 @app.post('/urls/<id_url>/checks')
 def check_url(id_url):
-    db.check_url(id_url)
-    flash('Страница успешно проверена', 'success')
+    if db.check_url(id_url):
+        flash('Страница успешно проверена', 'success')
+    else:
+        flash('Произошла ошибка при проверке', 'danger')
     return redirect(url_for('show_url', id_url=id_url))
