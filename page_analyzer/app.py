@@ -46,7 +46,7 @@ def add_urls():
     else:
         for msg, cat in errors:
             flash(msg, cat)
-        return render_template('index.html'), 422
+    return render_template('index.html'), 422
 
 
 @app.get('/urls/<id_url>')
