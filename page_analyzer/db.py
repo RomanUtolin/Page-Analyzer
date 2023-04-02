@@ -69,6 +69,7 @@ def check_url(id_url, conn):
                               seo_data['h1'],
                               seo_data['title'],))
                 conn.commit()
+                return True
     except errors as error:
         print(error)
 
