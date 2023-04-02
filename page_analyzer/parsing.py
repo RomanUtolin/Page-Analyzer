@@ -15,7 +15,6 @@ def get_seo_data(url):
         return find_tag(response, tags, dict_tags)
     except Exception as e:
         print(e)
-        return False
 
 
 def find_tag(response, tags, dict_tags):

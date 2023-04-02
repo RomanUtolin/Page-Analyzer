@@ -48,18 +48,13 @@ def get_urls():
 def add_urls():
     url = request.form.get('url')
     error = urls.validate_url(url)
-    if not error:
-        url = urls.normalized_url(url)
-        id_url = db.repeat(url, connect_db())
-        if id_url:
-            flash('Страница уже существует', 'info')
-        else:
-            id_url = db.add_urls(url, connect_db())
-            flash('Страница успешно добавлена', 'success')
-        return redirect(url_for('show_url', id_url=id_url))
-    for msg, cat in error:
-        flash(msg, cat)
-    return render_template('index.html'), 422
+    if error:
+        flash(error['text'], 'danger')
+        return render_template('index.html'), 422
+    url = urls.normalized_url(url)
+    id_url, msg = db.add_urls(url, connect_db())
+    flash(msg['text'], msg['cat'])
+    return redirect(url_for('show_url', id_url=id_url))
 
 
 @app.get('/urls/<int:id_url>')

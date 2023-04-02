@@ -9,11 +9,11 @@ def normalized_url(url):
 
 
 def validate_url(url):
-    errors = []
+    errors = {}
     if len(url) == 0:
-        errors.append(('URL обязателен', 'danger'))
+        errors['text'] = 'URL обязателен'
     elif len(url) > 255:
-        errors.append(('URL превышает 255 символов', 'danger'))
+        errors['text'] = 'URL превышает 255 символов'
     elif not validators.url(url):
-        errors.append(('Некорректный URL', 'danger'))
+        errors['text'] = 'Некорректный URL'
     return errors

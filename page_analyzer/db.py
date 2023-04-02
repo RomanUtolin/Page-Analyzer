@@ -19,7 +19,6 @@ def get_urls(conn):
             return url_from_bd
     except errors as error:
         print(error)
-        return False
 
 
 def show_url(id_url, conn):
@@ -44,7 +43,6 @@ def show_url(id_url, conn):
             return url_name, url_check_info
     except errors as error:
         print(error)
-        return False
 
 
 def check_url(id_url, conn):
@@ -71,26 +69,32 @@ def check_url(id_url, conn):
                               seo_data['h1'],
                               seo_data['title'],))
                 conn.commit()
-                return True
     except errors as error:
         print(error)
-        return False
 
 
 def add_urls(url, conn):
     sql_for_get_id = 'SELECT id FROM urls WHERE name=%s'
     sql_for_add = 'INSERT INTO urls (name, created_at) VALUES (%s, %s)'
-    try:
-        with conn.cursor(cursor_factory=extras.DictCursor) as curs:
-            curs.execute(sql_for_add, (url, datetime.now(),))
-            conn.commit()
-            curs.execute(sql_for_get_id, (url,))
-            url_from_bd = curs.fetchone()
-            return url_from_bd['id']
+    msg = {}
+    id_url = repeat(url, conn)
+    if id_url:
+        msg['text'] = 'Страница уже существует'
+        msg['cat'] = 'info'
+        return id_url, msg
+    else:
+        try:
+            with conn.cursor(cursor_factory=extras.DictCursor) as curs:
+                curs.execute(sql_for_add, (url, datetime.now(),))
+                conn.commit()
+                curs.execute(sql_for_get_id, (url,))
+                url_from_bd = curs.fetchone()
+                msg['text'] = 'Страница успешно добавлена'
+                msg['cat'] = 'success'
+                return url_from_bd['id'], msg
 
-    except errors as error:
-        print(error)
-        return False
+        except errors as error:
+            print(error)
 
 
 def repeat(url, conn):
@@ -104,4 +108,3 @@ def repeat(url, conn):
 
     except errors as error:
         print(error)
-        return False
