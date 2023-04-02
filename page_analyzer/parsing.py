@@ -13,8 +13,8 @@ def get_seo_data(url):
         response.raise_for_status()
         dict_tags['status_code'] = response.status_code
         return find_tag(response, tags, dict_tags)
-    except Exception as e:
-        print(e)
+    except Exception as error:
+        print(error)
 
 
 def find_tag(response, tags, dict_tags):
