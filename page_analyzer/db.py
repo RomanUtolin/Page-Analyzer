@@ -47,6 +47,7 @@ def show_url(id_url, conn):
 
 def check_url(id_url, conn):
     sql = 'SELECT name FROM urls WHERE id = %s;'
+    msg = {}
     try:
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
             curs.execute(sql, (id_url,))
@@ -69,9 +70,14 @@ def check_url(id_url, conn):
                               seo_data['h1'],
                               seo_data['title'],))
                 conn.commit()
-                return True
+                msg['text'] = 'Страница успешно проверена'
+                msg['cat'] = 'success'
+                return msg
     except errors as error:
         print(error)
+    msg['text'] = 'Произошла ошибка при проверке'
+    msg['cat'] = 'danger'
+    return msg
 
 
 def add_urls(url, conn):
