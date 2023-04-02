@@ -62,7 +62,7 @@ def add_urls():
     return render_template('index.html'), 422
 
 
-@app.get('/urls/<id_url>')
+@app.get('/urls/<int:id_url>')
 def show_url(id_url):
     url_name, url_check = db.show_url(id_url, connect_db())
     if not url_name:
@@ -70,7 +70,7 @@ def show_url(id_url):
     return render_template('url_id.html', url=url_name, url_check=url_check)
 
 
-@app.post('/urls/<id_url>/checks')
+@app.post('/urls/<int:id_url>/checks')
 def check_url(id_url):
     if db.check_url(id_url, connect_db()):
         flash('Страница успешно проверена', 'success')
