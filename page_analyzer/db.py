@@ -40,7 +40,7 @@ def show_url(id_url, conn):
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
             curs.execute(sql, (id_url,))
             url_check_info = curs.fetchall()
-            app.app.logger.info(f'successful show_url_check_info id={id_url} from bd')
+            app.app.logger.info(f'successful check_info id={id_url} from bd')
             return url_from_bd, url_check_info
     except errors as error:
         app.app.logger.warning(error)
@@ -71,7 +71,7 @@ def check_url(id_url, conn):
                 conn.commit()
                 msg['text'] = 'Страница успешно проверена'
                 msg['categories'] = 'success'
-                app.app.logger.info(f'successful check_url id={id_url} insert into bd')
+                app.app.logger.info(f'successful check id={id_url} insert bd')
                 return msg
         except errors as error:
             app.app.logger.warning(error)
