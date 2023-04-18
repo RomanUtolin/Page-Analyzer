@@ -1,3 +1,4 @@
+from page_analyzer import app
 from page_analyzer.parsing import get_seo_data
 from psycopg2 import extras, errors
 from datetime import datetime
@@ -16,9 +17,10 @@ def get_urls(conn):
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
             curs.execute(sql)
             url_from_bd = curs.fetchall()
+            app.app.logger.info('successful get_urls from bd')
             return url_from_bd
     except errors as error:
-        print(error)
+        app.app.logger.warning(error)
 
 
 def show_url(id_url, conn):
@@ -40,9 +42,10 @@ def show_url(id_url, conn):
             url_name = curs.fetchone()
             curs.execute(sql_for_check_info, (id_url,))
             url_check_info = curs.fetchall()
+            app.app.logger.info('successful show_url from bd')
             return url_name, url_check_info
     except errors as error:
-        print(error)
+        app.app.logger.warning(error)
 
 
 def check_url(id_url, conn):
@@ -52,6 +55,7 @@ def check_url(id_url, conn):
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
             curs.execute(sql, (id_url,))
             url = curs.fetchone()
+            app.app.logger.info('successful get url_name from bd')
             seo_data = get_seo_data(url[0])
             if seo_data:
                 sql = '''INSERT INTO
@@ -71,12 +75,13 @@ def check_url(id_url, conn):
                               seo_data['title'],))
                 conn.commit()
                 msg['text'] = 'Страница успешно проверена'
-                msg['cat'] = 'success'
+                msg['categories'] = 'success'
+                app.app.logger.info('successful check_url insert into bd')
                 return msg
     except errors as error:
-        print(error)
+        app.app.logger.warning(error)
     msg['text'] = 'Произошла ошибка при проверке'
-    msg['cat'] = 'danger'
+    msg['categories'] = 'danger'
     return msg
 
 
@@ -87,21 +92,23 @@ def add_urls(url, conn):
     id_url = repeat(url, conn)
     if id_url:
         msg['text'] = 'Страница уже существует'
-        msg['cat'] = 'info'
+        msg['categories'] = 'info'
         return id_url, msg
     else:
         try:
             with conn.cursor(cursor_factory=extras.DictCursor) as curs:
                 curs.execute(sql_for_add, (url, datetime.now(),))
                 conn.commit()
+                app.app.logger.info(f'Successful select {url} from bd')
                 curs.execute(sql_for_get_id, (url,))
                 url_from_bd = curs.fetchone()
+                app.app.logger.info(f'Successful add {url} to bd')
                 msg['text'] = 'Страница успешно добавлена'
-                msg['cat'] = 'success'
+                msg['categories'] = 'success'
                 return url_from_bd['id'], msg
 
         except errors as error:
-            print(error)
+            app.app.logger.info(f'Unsuccessful add {url} to bd', error)
 
 
 def repeat(url, conn):
@@ -110,8 +117,9 @@ def repeat(url, conn):
         with conn.cursor(cursor_factory=extras.DictCursor) as curs:
             curs.execute(sql, (url,))
             url_from_bd = curs.fetchone()
+            app.app.logger.info(f'Successful Check repeat {url} from bd')
             if url_from_bd:
                 return url_from_bd['id']
 
     except errors as error:
-        print(error)
+        app.app.logger.info(f'Unsuccessful Check repeat {url} from bd', error)

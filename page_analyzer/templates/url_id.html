@@ -19,7 +19,7 @@
         </tr>
         <tr>
           <td>Дата создания</td>
-          <td>{{ url['created_at'].strftime('%Y-%m-%d') }}</td>
+          <td>{{ url['created_at'] | strip }}</td>
         </tr>
       </tbody>
     </table>
@@ -42,15 +42,14 @@
     </tr>
     {% for check in url_check -%}
       <tr>
-        <td>{{ check['check_id'] if check['check_id'] }}</td>
-        <td>{{ check['status_code'] if check['status_code'] }}</td>
-        <td>{{ check['h1'] if check['h1'] }}</td>
-        <td>{{ check['title'] if check['title'] }}</td>
-        <td>{{ check['description'] if check['description'] }}</td>
-        <td>{{ check['site_check'].strftime('%Y-%m-%d') if check['site_check'] }}</td>
+        <td>{{ check['check_id'] }}</td>
+        <td>{{ check['status_code'] }}</td>
+        <td>{{ check['h1'] }}</td>
+        <td>{{ check['title'] }}</td>
+        <td>{{ check['description'] }}</td>
+        <td>{{ check['site_check'] | strip }}</td>
       </tr>
     {% endfor -%}
-    </tr>
     
       </tbody>
     </table>

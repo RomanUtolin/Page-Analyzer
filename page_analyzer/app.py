@@ -1,5 +1,7 @@
 import os
 from page_analyzer import db, urls
+from psycopg2 import connect, errors
+from dotenv import load_dotenv
 from flask import (Flask,
                    render_template,
                    redirect,
@@ -7,8 +9,6 @@ from flask import (Flask,
                    request,
                    flash,
                    abort)
-from psycopg2 import connect, errors
-from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -22,14 +22,21 @@ app.secret_key = SECRET_KEY
 def connect_db():
     try:
         with connect(DATABASE_URL) as conn:
+            app.logger.info('Successful connect to db')
             return conn
     except errors as error:
-        print(error)
+        app.logger.warning(error)
         return False
+
+
+@app.template_filter('strip')
+def strip_date_filter(date):
+    return date.strftime('%Y-%m-%d')
 
 
 @app.errorhandler(404)
 def page_not_found(error):
+    app.logger.info(error)
     return render_template('404.html')
 
 
@@ -53,7 +60,7 @@ def add_urls():
         return render_template('index.html'), 422
     url = urls.normalized_url(url)
     id_url, msg = db.add_urls(url, connect_db())
-    flash(msg['text'], msg['cat'])
+    flash(msg['text'], msg['categories'])
     return redirect(url_for('show_url', id_url=id_url))
 
 
@@ -68,5 +75,5 @@ def show_url(id_url):
 @app.post('/urls/<int:id_url>/checks')
 def check_url(id_url):
     msg = db.check_url(id_url, connect_db())
-    flash(msg['text'], msg['cat'])
+    flash(msg['text'], msg['categories'])
     return redirect(url_for('show_url', id_url=id_url))

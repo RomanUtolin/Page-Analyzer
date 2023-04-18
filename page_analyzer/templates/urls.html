@@ -19,7 +19,7 @@
         <tr>
           <td>{{ site['id'] }}</td>
           <td><a href="{{ url_for('show_url', id_url=site['id']) }}">{{ site['name'] }}</a></td>
-          <td>{{ site['site_check'].strftime('%Y-%m-%d') if site['site_check'] }}</td>
+          <td>{{ site['site_check'] | strip if site['site_check'] }}</td>
           <td>{{ site['status_code'] if site['status_code'] }}</td>
         </tr>
       {% endfor -%}
