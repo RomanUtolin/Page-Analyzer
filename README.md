@@ -8,13 +8,13 @@ Page Analyzer - a site that analyzes the specified pages for SEO suitability
 ### Install 
 
 ````
-git clone git@github.com:RomanUtolin/python-project-83.git
+git clone git@github.com:RomanUtolin/Page-Analyzer.git
 ````
 ````
 add '.env' in the root directory of your project
 
-    add DATABASE_URL - Flask app secret key
-    add SECRET_KEY - Database connection url
+    add DATABASE_URL - Database connection url
+    add SECRET_KEY - Flask app secret key
 ````
 ````
 make install
